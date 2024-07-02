@@ -1,17 +1,16 @@
 package com.example.demo.controller;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.model.Auth;
 import com.example.demo.model.Users;
+import com.example.demo.repo.AuthRepo;
 import com.example.demo.repo.UserRepo;
 
 @RestController
@@ -19,24 +18,29 @@ import com.example.demo.repo.UserRepo;
 public class LoginController {
 	
 	@Autowired
+	private AuthRepo authRepo;
+	
+	@Autowired
 	private UserRepo userRepo;
 	
-	@GetMapping("/login")
-	public String login(String user, String pwd) {
+	@PostMapping("/login")
+	public Users login(@RequestBody Auth auth) {
 
-		System.out.println("user:"+user);
-		System.out.println("pwd:"+pwd);
+		System.out.println("user:"+auth.getUserName());
+		System.out.println("pwd:"+auth.getPassword());
 		
-		if(user.equalsIgnoreCase(pwd)) {
-			System.out.println("helooo:");
-			
-			return "success";
-		}
-		else {
-			return "failed";
-			
-		}
+		if(auth!=null) {
 		
+			Optional<Auth> auth1=authRepo.findById(auth.getUserName());
+			Auth a=auth1.get();
+		if(a.getUserName()!=null) {
+		 Optional<Users> users= userRepo.findById(Integer.toString(7));
+		 Users user=users.get();
+		 System.out.println(user);
+			return user;
+		}
+		}
+		return null;
 		
 	}
 	@PostMapping("/register")
@@ -47,7 +51,7 @@ public class LoginController {
 			Auth auth= new Auth();
 			auth.setUserName(user.getUserName());
 			auth.setPassword(user.getPassword());
-			userRepo.save(auth);
+			authRepo.save(auth);
 		
 		System.out.println(user);
 		
